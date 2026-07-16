@@ -1,68 +1,51 @@
-import os
-import json
-import requests
-from PIL import Image
-from io import BytesIO
+# ... (Varche folders ani tracker set karnyacha code tasach thev) ...
 
-# 1. Setup Folders
-folders = ["preview", "HD", "FHD", "2K", "4K"]
-for f in folders:
-    os.makedirs(f, exist_ok=True)
-
-# 2. Check Tracker (Kontya divasacha kam chalu aahe?)
-try:
-    with open("tracker.txt", "r") as f:
-        batch = int(f.read().strip())
-except:
-    batch = 0
-
+# 10 Days Loop (Batch 0 to 9)
 if batch >= 10: 
-    batch = 0 # 10 divas zale ki parat 0 pasun (Overwrite loop)
-
-start_id = (batch * 200) + 1
-end_id = start_id + 199
-print(f"Bhidu, Aajcha Batch: {batch}. Generating Wallpapers from {start_id} to {end_id}")
+    batch = 0
 
 latest_updates = []
 
-# 3. Generate and Resize Loop
-for i in range(start_id, end_id + 1):
-    img_id = f"wall_{i:04d}" # Example: wall_001
+# 20 Categories Prompts List
+category_prompts = [
+    "stunning dark amoled wallpaper, pure black background, 4k", # Cat 0
+    "epic anime style wallpaper, vibrant colors, 4k", # Cat 1
+    "breathtaking nature landscape, mountains, 4k", # Cat 2
+    "cyberpunk futuristic city, neon lights, 4k", # Cat 3
+    "hyper-realistic supercars, luxury sports bikes, 4k", # Cat 4
+    "minimalist clean design, modern 4k", # Cat 5
+    "magical fantasy world, epic ai art, 4k", # Cat 6
+    "deep space, galaxy, universe, 4k", # Cat 7
+    "superhero cinematic lighting, epic action scene, 4k", # Cat 8
+    "abstract 3d render, colorful shapes, 4k", # Cat 9
+    "cute 3d cartoon characters, kid shows style like tom and jerry, 4k", # Cat 10
+    "cute pets, wild animals, lions, dogs, wildlife photography 4k", # Cat 11
+    "beautiful floral aesthetic, soft pastel colors, roses, for girls 4k", # Cat 12
+    "epic gaming esports background, cyberpunk gaming 4k", # Cat 13
+    "peaceful spiritual background, zen, divine 4k", # Cat 14
+    "neon glowing art, bright led shapes 4k", # Cat 15
+    "romantic love hearts, moody aesthetic 4k", # Cat 16
+    "beautiful cityscapes, night city travel aesthetic 4k", # Cat 17
+    "spooky dark horror background, cinematic 4k", # Cat 18
+    "liquid texture, metallic geometric patterns 4k" # Cat 19
+]
+
+print(f"Bhidu, Aajcha Batch: {batch}. Updating 10 images in all 20 categories!")
+
+# Loop through all 20 categories
+for cat_index in range(20):
+    # Calculate starting ID for today's 10 images in THIS category
+    base_id = cat_index * 100 
+    start_offset = batch * 10 + 1
     
-    # Pollinations AI Free Endpoint (Negative prompt is built-in for safety)
-    # Using a random seed (i) to get unique images every time
-    ai_url = f"https://image.pollinations.ai/prompt/stunning%204k%20mobile%20wallpaper%20masterpiece%20nature%20cyberpunk%20cars?nologo=true&seed={i}"
-    
-    try:
-        response = requests.get(ai_url)
-        img = Image.open(BytesIO(response.content))
+    for j in range(10):
+        current_img_num = base_id + start_offset + j
+        img_id = f"wall_{current_img_num:04d}" # Example: wall_0001
         
-        # Resize parameters
-        sizes = {
-            'preview': (480, 854),
-            'HD': (720, 1280),
-            'FHD': (1080, 1920),
-            '2K': (1440, 2560),
-            '4K': (2160, 3840)
-        }
+        prompt = category_prompts[cat_index]
+        formatted_prompt = prompt.replace(" ", "%20")
         
-        # Save in all 5 folders
-        for folder, res in sizes.items():
-            target_path = os.path.join(folder, f"{img_id}.webp")
-            resized_img = img.resize(res, Image.Resampling.LANCZOS)
-            resized_img.save(target_path, 'WEBP', quality=85 if folder != 'preview' else 60)
-            
-        latest_updates.append(img_id)
-        print(f"Successfully generated: {img_id}")
+        # Pollinations AI Free Endpoint (Unique seed generated using img_id)
+        ai_url = f"https://image.pollinations.ai/prompt/{formatted_prompt}?nologo=true&seed={current_img_num}"
         
-    except Exception as e:
-        print(f"Error on {img_id}: {e}")
-
-# 4. Update JSON & Tracker
-with open("latest_updates.json", "w") as f:
-    json.dump(latest_updates, f)
-
-with open("tracker.txt", "w") as f:
-    f.write(str(batch + 1)) # Puthchya divasachi tayari
-
-print("Aajcha target complete Bhidu!")
+        # ... (Pudhcha Image download ani save karnyacha code tasach rahil) ...
