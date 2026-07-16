@@ -3,7 +3,7 @@ name: Daily Wallpaper Generator
 on:
   schedule:
     - cron: '0 20 * * *' # દરરોજ भारतीय वेळेनुसार रात्री 1:30 वाजता रन होईल (UTC 20:00)
-  workflow_dispatch: # हे टाकल्यामुळे तू मॅन्युअली कधीही बटण दाबून रन करू शकतोस!
+  workflow_dispatch: # तू कधीही मॅन्युअली रन करू शकतोस
 
 jobs:
   generate_wallpapers:
@@ -31,5 +31,5 @@ jobs:
           git config --global user.name "Wallpaper Bot"
           git config --global user.email "bot@wallpaper-app.com"
           git add .
-          git commit -m "Auto-generated daily 200 wallpapers" || echo "No changes to commit"
+          git commit -m "Auto-generated daily 200 wallpapers (Horizontal Update)" || echo "No changes to commit"
           git push
