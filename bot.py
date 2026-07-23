@@ -32,9 +32,9 @@ category_prompts = [
     "minimalist clean design, modern 4k masterpiece",
     "magical fantasy world, epic ai art, 4k masterpiece",
     "deep space, galaxy, universe, 4k masterpiece",
-    "epic futuristic warriors, cyber armor, cinematic lighting, action scene, 4k masterpiece", # Changed from Superheroes
+    "epic futuristic warriors, cyber armor, cinematic lighting, action scene, 4k masterpiece",
     "abstract 3d render, colorful shapes, 4k masterpiece",
-    "cute 3d cartoon animal characters, funny cat and mouse playing, kid shows style, 4k masterpiece", # Changed from Tom & Jerry
+    "cute 3d cartoon animal characters, funny cat and mouse playing, kid shows style, 4k masterpiece",
     "cute pets, wild animals, lions, dogs, wildlife photography 4k masterpiece",
     "beautiful floral aesthetic, soft pastel colors, roses, for girls 4k masterpiece",
     "epic gaming esports background, cyberpunk gaming 4k masterpiece",
@@ -48,7 +48,7 @@ category_prompts = [
 
 latest_updates = []
 
-# 3. Generate and Resize Loop (With 4K Force & Retry Logic)
+# 3. Generate and Resize Loop (With 4K Force, Retry Logic & Lossless WebP)
 for cat_index in range(20):
     base_id = (cat_index * 100) 
     start_offset = (batch * 10) + 1 
@@ -83,10 +83,20 @@ for cat_index in range(20):
                         '4K': (2160, 3840)
                     }
                     
+                    # PRO FIX 3: Premium Lossless Quality Setting
                     for folder, res in sizes.items():
                         target_path = os.path.join(folder, f"{img_id}.webp")
                         resized_img = img.resize(res, Image.Resampling.LANCZOS)
-                        resized_img.save(target_path, 'WEBP', quality=95 if folder != 'preview' else 60)
+                        
+                        if folder == 'preview':
+                            # Fast loading for app thumbnails
+                            resized_img.save(target_path, 'WEBP', quality=60)
+                        elif folder in ['4K', '2K']:
+                            # 100% Original Quality (Zero Compression)
+                            resized_img.save(target_path, 'WEBP', lossless=True)
+                        else:
+                            # High quality for HD and FHD
+                            resized_img.save(target_path, 'WEBP', quality=100, method=6)
                         
                     latest_updates.append(img_id)
                     success = True
